@@ -9,10 +9,11 @@
       --bg:#0b0b0f; --panel:#121217; --ink:#eaeaea; --accent:#ffd166; --accent2:#ffcc33; --muted:#9aa0a6;
     }
     html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Noto Naskh Arabic","Tahoma","Arial",sans-serif}
-    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
     .card{
       width:min(980px,96vw); background:linear-gradient(180deg, rgba(255,209,102,0.06), transparent 18%), var(--panel);
       border:1px solid #1f2230; border-radius:18px; padding:22px 18px; box-shadow:0 20px 60px rgba(0,0,0,.45), inset 0 0 120px rgba(255,209,102,.04);
+      position:relative; z-index:2;
     }
     h1{margin:4px 0 14px; font-weight:800; letter-spacing:.3px; text-align:center; font-size:clamp(20px,5.6vw,34px)}
     .sub{margin:0 0 18px; color:var(--muted); text-align:center; font-size:clamp(13px,3.4vw,16px)}
@@ -37,13 +38,19 @@
     canvas{width:min(100%,980px); height:auto; border-radius:14px; background:#fff; box-shadow:0 18px 40px rgba(0,0,0,.35)}
     .dl{display:none}
     .ok{color:#8ef6a0; font-size:13px}
+    #confetti {position:fixed; inset:0; pointer-events:none; z-index:3; display:none;}
+    .grid-tokens{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+    @media (max-width:640px){.grid-tokens{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
+  <!-- كونفيتي -->
+  <canvas id="confetti"></canvas>
+
   <div class="wrap">
     <div class="card">
-      <h1>مولد شهادة «مدير الفضاوة»</h1>
-      <p class="sub">أدخل اسمك ويُولِّد لك شهادة فخمة قابلة للتحميل — تحت إشراف <strong>المهندس المدرب المعضل سليمان — Rizzo</strong></p>
+      <h1>بوابة «مدير الفضاوة»</h1>
+      <p class="sub">اكتب اسمك + أدخل **أكواد المرور** من الصفحات السابقة (Snap/Instа/YouTube/Prank/China/Slim). إذا كلها صحيحة، تنفتح لك الشهادة للتحميل.</p>
 
       <form id="f">
         <div class="field">
@@ -54,10 +61,21 @@
           <label>الاسم الثاني</label>
           <input id="second" placeholder="مثال: العتيبي" required />
         </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>أكواد المرور (زي ما ظهرت على كل صفحة)</label>
+          <div class="grid-tokens">
+            <input id="t1" placeholder="Snap token" />
+            <input id="t2" placeholder="Insta token" />
+            <input id="t3" placeholder="YouTube token" />
+            <input id="t4" placeholder="Prank token" />
+            <input id="t5" placeholder="China token" />
+            <input id="t6" placeholder="Slim token" />
+          </div>
+        </div>
       </form>
 
       <div class="row">
-        <button id="gen">توليد الشهادة</button>
+        <button id="verify">تحقق & فتح الشهادة</button>
         <a id="download" class="dl" download="RIZZO-Certificate.png">
           <button type="button">تحميل الشهادة PNG</button>
         </a>
@@ -71,19 +89,32 @@
     </div>
   </div>
 
+  <!-- QR يوتيوب اختياري (ارفع qr-yt.png بجانب الملف) -->
+  <img id="qrImg" src="qr-yt.png" alt="QR YouTube" style="display:none" />
+
   <script>
-    // إعدادات عامة
-    const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));  // دقة معقولة للجوال
+    /* ===== الإعدادات العامة ===== */
+    const EXPECTED = {
+      snap: 'RZ-SNAP-9F',
+      insta:'RZ-INST-2K',
+      yt:   'RZ-YT-7Q',
+      prank:'RZ-PRK-5M',
+      china:'RZ-CHN-8X',
+      slim: 'RZ-SLM-3Z'
+    };
+    // لو تبغى تغيّر الأكواد لاحقاً، بس عدّل EXPECTED وفقط.
+
+    const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     const cv = document.getElementById('cv');
     const ctx = cv.getContext('2d');
     const msg = document.getElementById('msg');
     const done = document.getElementById('done');
-    const genBtn = document.getElementById('gen');
+    const verifyBtn = document.getElementById('verify');
     const dlLink = document.getElementById('download');
+    const qrImg = document.getElementById('qrImg');
 
-    // ضبط الدقة الفعلية للكانفس
     function scaleCanvas(){
-      const w = 1600, h = 1131; // قريب من A4 landscape
+      const w = 1600, h = 1131;
       cv.width = Math.floor(w * DPR);
       cv.height = Math.floor(h * DPR);
       cv.style.width = w + 'px';
@@ -92,127 +123,138 @@
     }
     scaleCanvas();
 
-    // رسم إطار زخرفي بسيط
+    /* ===== رسم الشهادة ===== */
     function frame(w,h){
-      // خلفية تدرّج عاجي
       const g = ctx.createLinearGradient(0,0,0,h);
-      g.addColorStop(0,'#fffdf7');
-      g.addColorStop(1,'#f7f3ea');
-      ctx.fillStyle = g;
-      ctx.fillRect(0,0,w,h);
-
-      // حد ذهبي مزدوج
-      ctx.lineWidth = 10;
-      ctx.strokeStyle = '#e6c35a';
-      ctx.strokeRect(30,30,w-60,h-60);
-
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#b7922e';
-      ctx.strokeRect(54,54,w-108,h-108);
-
-      // لمعة خفيفة
+      g.addColorStop(0,'#fffdf7'); g.addColorStop(1,'#f7f3ea');
+      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+      ctx.lineWidth = 10; ctx.strokeStyle = '#e6c35a'; ctx.strokeRect(30,30,w-60,h-60);
+      ctx.lineWidth = 2; ctx.strokeStyle = '#b7922e'; ctx.strokeRect(54,54,w-108,h-108);
       const g2 = ctx.createLinearGradient(0,0,w,0);
       g2.addColorStop(0,'rgba(255,215,120,.18)');
       g2.addColorStop(0.5,'rgba(255,255,255,0)');
       g2.addColorStop(1,'rgba(255,215,120,.18)');
-      ctx.fillStyle = g2;
-      ctx.fillRect(54,54,w-108,120);
+      ctx.fillStyle = g2; ctx.fillRect(54,54,w-108,120);
     }
-
-    // أداة نص عربية وسطية
-    function drawText(txt, x, y, size, color, weight='700', family='"Noto Naskh Arabic","Tahoma","Arial",sans-serif'){
-      ctx.save();
-      ctx.fillStyle = color; ctx.textBaseline = 'middle';
-      ctx.font = `${weight} ${size}px ${family}`;
-      ctx.direction = 'rtl'; ctx.textAlign = 'center';
-      ctx.fillText(txt, x, y);
-      ctx.restore();
+    function drawText(txt,x,y,size,color,weight='700',family='"Noto Naskh Arabic","Tahoma","Arial",sans-serif'){
+      ctx.save(); ctx.fillStyle=color; ctx.textBaseline='middle';
+      ctx.font=`${weight} ${size}px ${family}`; ctx.direction='rtl'; ctx.textAlign='center';
+      ctx.fillText(txt,x,y); ctx.restore();
     }
-
-    // عنوان انجليزي ثانوي
-    function drawLatin(txt, x, y, size, color, weight='800', family='system-ui,Segoe UI,Arial,sans-serif'){
-      ctx.save();
-      ctx.fillStyle = color; ctx.textBaseline = 'middle';
-      ctx.font = `${weight} ${size}px ${family}`;
-      ctx.textAlign = 'center';
-      ctx.fillText(txt, x, y);
-      ctx.restore();
+    function drawLatin(txt,x,y,size,color,weight='800',family='system-ui,Segoe UI,Arial,sans-serif'){
+      ctx.save(); ctx.fillStyle=color; ctx.textBaseline='middle';
+      ctx.font=`${weight} ${size}px ${family}`; ctx.textAlign='center';
+      ctx.fillText(txt,x,y); ctx.restore();
     }
-
-    // ختم RIZZO
     function stamp(x,y,r){
-      ctx.save();
-      ctx.translate(x,y);
-      ctx.rotate(-0.12);
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = 'rgba(230, 155, 40, 0.85)';
-      ctx.fillStyle = 'rgba(255, 215, 120, 0.16)';
+      ctx.save(); ctx.translate(x,y); ctx.rotate(-0.12);
+      ctx.lineWidth=6; ctx.strokeStyle='rgba(230,155,40,0.85)'; ctx.fillStyle='rgba(255,215,120,0.16)';
       ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.stroke(); ctx.fill();
-      drawLatin('RIZZO',0,0,Math.floor(r*0.35),'#c68a16','900');
-      ctx.restore();
+      drawLatin('RIZZO',0,0,Math.floor(r*0.35),'#c68a16','900'); ctx.restore();
     }
-
     function renderCert(fullName){
-      done.textContent = ''; msg.textContent = '';
-
-      const W = 1600, H = 1131;
+      done.textContent=''; msg.textContent='';
+      const W=1600,H=1131;
       frame(W,H);
-
-      // شعار علوي
       drawLatin('RIZZO — CERTIFICATE', W/2, 150, 34, '#a47b16','900');
-
-      // العنوان الرئيسي
       drawText('شهادة «مدير الفضاوة»', W/2, 250, 54, '#3a2a09','900');
-
-      // المكرم/ـة الاسم
       drawText('المكرم/ـة', W/2, 365, 30, '#6b5a2a','800');
       drawText(fullName, W/2, 425, 48, '#0b0b0b','900');
-
-      // نص الاستحقاق
       drawText('لحصوله/ـا على شهادة «مدير الفضاوة» نظير اجتياز تجربة الأكواد التفاعلية بنجاح.', W/2, 500, 28, '#1b1b1b','700');
-
-      // سطر الإشراف
       drawText('تحت إشراف: المهندس المدرب المعضل سليمان — Rizzo', W/2, 570, 26, '#1b1b1b','800');
-
-      // التاريخ
-      const dt = new Date();
-      const dstr = dt.toLocaleDateString('ar-SA', {year:'numeric', month:'long', day:'numeric'});
-      drawText('التاريخ: ' + dstr, W/2, 620, 24, '#3b3b3b','700');
-
-      // تواقيع
+      const dstr=new Date().toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric'});
+      drawText('التاريخ: '+dstr, W/2, 620, 24, '#3b3b3b','700');
       drawText('توقيع المشرف', W/2 - 420, 760, 22, '#3b3b3b','700');
       drawText('توقيع المتدرّب', W/2 + 420, 760, 22, '#3b3b3b','700');
-
-      ctx.strokeStyle = '#b2923a'; ctx.lineWidth = 2;
+      ctx.strokeStyle='#b2923a'; ctx.lineWidth=2;
       ctx.beginPath(); ctx.moveTo(W/2 - 560, 790); ctx.lineTo(W/2 - 280, 790); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(W/2 + 280, 790); ctx.lineTo(W/2 + 560, 790); ctx.stroke();
-
-      // ختم
       stamp(W-260, H-260, 120);
+
+      // QR اختياري
+      const qr = document.getElementById('qrImg');
+      const qrSize = 180, qrX = W - 54 - qrSize, qrY = H - 54 - qrSize;
+      ctx.fillStyle='rgba(0,0,0,0.04)'; ctx.fillRect(qrX-10, qrY-32, qrSize+20, qrSize+42);
+      drawLatin('Scan: YouTube / Rizzo', qrX+qrSize/2, qrY-12, 18, '#6a5a2a','800');
+      if (qr.complete) { try{ctx.drawImage(qr, qrX, qrY, qrSize, qrSize);}catch(e){} }
+      else { qr.onload = ()=>{ try{ctx.drawImage(qr, qrX, qrY, qrSize, qrSize);}catch(e){} }; }
     }
 
-    // توليد + تنزيل
-    function generate(){
-      const first = (document.getElementById('first').value || '').trim();
-      const second = (document.getElementById('second').value || '').trim();
-      if(!first || !second){
-        msg.textContent = 'رجاءً اكتب الاسم الأول والثاني.';
+    /* ===== تحقق الأكواد ثم فتح التوليد ===== */
+    function clean(s){return (s||'').trim().toUpperCase();}
+    function verifyTokens(){
+      const f = clean(document.getElementById('first').value);
+      const s = clean(document.getElementById('second').value);
+      const t1 = clean(document.getElementById('t1').value);
+      const t2 = clean(document.getElementById('t2').value);
+      const t3 = clean(document.getElementById('t3').value);
+      const t4 = clean(document.getElementById('t4').value);
+      const t5 = clean(document.getElementById('t5').value);
+      const t6 = clean(document.getElementById('t6').value);
+
+      if(!f || !s){ msg.textContent='اكتب الاسم الأول والثاني أولاً.'; return; }
+
+      const ok = (t1===EXPECTED.snap && t2===EXPECTED.insta && t3===EXPECTED.yt &&
+                  t4===EXPECTED.prank && t5===EXPECTED.china && t6===EXPECTED.slim);
+
+      if(!ok){
+        msg.textContent = 'أكواد المرور غير صحيحة أو ناقصة. زر كل الأكواد مرة ثانية وانسخ الرموز كما هي.';
         return;
       }
-      const full = `${first} ${second}`;
-      renderCert(full);
 
-      // تجهيز رابط التحميل
+      // إذا صح → ارسم الشهادة وجهّز التحميل + كونفيتي
+      renderCert(f + ' ' + s);
       const dataURL = cv.toDataURL('image/png');
       dlLink.href = dataURL;
       dlLink.classList.remove('dl');
-      done.textContent = '✅ تمت جاهزية الشهادة — اضغط "تحميل الشهادة PNG".';
+      done.textContent = '✅ تم التحقق — الشهادة جاهزة. اضغط "تحميل الشهادة PNG".';
+      launchConfetti(4000);
     }
 
-    genBtn.addEventListener('click', generate);
+    document.getElementById('verify').addEventListener('click', verifyTokens);
+    renderCert('فلان الفلاني'); // معاينة أولية
 
-    // توليد مثال افتراضي أول ما تُفتح الصفحة (للمعاينة)
-    renderCert('فلان الفلاني');
+    /* ===== كونفيتي ===== */
+    const confetti = document.getElementById('confetti');
+    const cctx = confetti.getContext('2d');
+    function resizeConfetti(){
+      confetti.width = innerWidth * DPR;
+      confetti.height = innerHeight * DPR;
+      confetti.style.width = innerWidth + 'px';
+      confetti.style.height = innerHeight + 'px';
+      cctx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    resizeConfetti(); addEventListener('resize', resizeConfetti);
+    let flakes=[], confettiRAF=null, confettiUntil=0;
+    function makeFlakes(n=120){
+      const colors=['#ffd166','#ff7b54','#6ee7b7','#60a5fa','#f472b6'];
+      flakes = Array.from({length:n}, ()=>({
+        x: Math.random()*innerWidth,
+        y: -20 - Math.random()*innerHeight*0.5,
+        r: 4 + Math.random()*6,
+        s: 1 + Math.random()*2.2,
+        a: Math.random()*Math.PI*2,
+        color: colors[(Math.random()*colors.length)|0]
+      }));
+    }
+    function drawFlakes(){
+      cctx.clearRect(0,0,innerWidth,innerHeight);
+      for(const f of flakes){
+        f.y += f.s;
+        f.x += Math.sin(f.a += 0.05) * 0.8;
+        cctx.fillStyle = f.color;
+        cctx.beginPath(); cctx.arc(f.x, f.y, f.r, 0, Math.PI*2); cctx.fill();
+      }
+    }
+    function loopConfetti(){
+      drawFlakes();
+      if (Date.now() < confettiUntil){ confettiRAF = requestAnimationFrame(loopConfetti); }
+      else { confetti.style.display='none'; cancelAnimationFrame(confettiRAF); }
+    }
+    function launchConfetti(ms=3000){
+      confetti.style.display='block';
+      makeFlakes(); confettiUntil = Date.now()+ms; loopConfetti();
+    }
   </script>
 </body>
 </html>
