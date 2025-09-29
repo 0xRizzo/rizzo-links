@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>شهادة مدير الفضاوة — Rizzo</title>
+  <style>
+    :root{
+      --bg:#0b0b0f; --panel:#121217; --ink:#eaeaea; --accent:#ffd166; --accent2:#ffcc33; --muted:#9aa0a6;
+    }
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Noto Naskh Arabic","Tahoma","Arial",sans-serif}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{
+      width:min(980px,96vw); background:linear-gradient(180deg, rgba(255,209,102,0.06), transparent 18%), var(--panel);
+      border:1px solid #1f2230; border-radius:18px; padding:22px 18px; box-shadow:0 20px 60px rgba(0,0,0,.45), inset 0 0 120px rgba(255,209,102,.04);
+    }
+    h1{margin:4px 0 14px; font-weight:800; letter-spacing:.3px; text-align:center; font-size:clamp(20px,5.6vw,34px)}
+    .sub{margin:0 0 18px; color:var(--muted); text-align:center; font-size:clamp(13px,3.4vw,16px)}
+    form{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:8px 0 16px}
+    @media (max-width:640px){form{grid-template-columns:1fr}}
+    .field{display:flex; flex-direction:column; gap:6px}
+    label{font-size:14px; color:#c7cad1}
+    input{
+      background:#0f1118; color:#eaecef; border:1px solid #2a2f3f; border-radius:10px; padding:12px 12px;
+      outline:none; font-size:16px;
+    }
+    input:focus{border-color:var(--accent)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; margin-top:6px}
+    button{
+      appearance:none; border:0; cursor:pointer; color:#101214; font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(180deg,var(--accent),var(--accent2));
+      padding:12px 16px; border-radius:12px; min-width:180px; box-shadow:0 8px 26px rgba(255,209,102,.25);
+    }
+    button:active{transform:translateY(1px)}
+    .hint{color:#a9b0bb; font-size:13px; text-align:center; margin-top:4px}
+    .canvasWrap{margin-top:18px; display:flex; flex-direction:column; align-items:center; gap:10px}
+    canvas{width:min(100%,980px); height:auto; border-radius:14px; background:#fff; box-shadow:0 18px 40px rgba(0,0,0,.35)}
+    .dl{display:none}
+    .ok{color:#8ef6a0; font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>مولد شهادة «مدير الفضاوة»</h1>
+      <p class="sub">أدخل اسمك ويُولِّد لك شهادة فخمة قابلة للتحميل — تحت إشراف <strong>المهندس المدرب المعضل سليمان — Rizzo</strong></p>
+
+      <form id="f">
+        <div class="field">
+          <label>الاسم الأول</label>
+          <input id="first" placeholder="مثال: محمد" required />
+        </div>
+        <div class="field">
+          <label>الاسم الثاني</label>
+          <input id="second" placeholder="مثال: العتيبي" required />
+        </div>
+      </form>
+
+      <div class="row">
+        <button id="gen">توليد الشهادة</button>
+        <a id="download" class="dl" download="RIZZO-Certificate.png">
+          <button type="button">تحميل الشهادة PNG</button>
+        </a>
+      </div>
+      <p id="msg" class="hint"></p>
+
+      <div class="canvasWrap">
+        <canvas id="cv" width="1600" height="1131" aria-label="معاينة الشهادة"></canvas>
+        <span id="done" class="ok"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // إعدادات عامة
+    const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));  // دقة معقولة للجوال
+    const cv = document.getElementById('cv');
+    const ctx = cv.getContext('2d');
+    const msg = document.getElementById('msg');
+    const done = document.getElementById('done');
+    const genBtn = document.getElementById('gen');
+    const dlLink = document.getElementById('download');
+
+    // ضبط الدقة الفعلية للكانفس
+    function scaleCanvas(){
+      const w = 1600, h = 1131; // قريب من A4 landscape
+      cv.width = Math.floor(w * DPR);
+      cv.height = Math.floor(h * DPR);
+      cv.style.width = w + 'px';
+      cv.style.height = h + 'px';
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    scaleCanvas();
+
+    // رسم إطار زخرفي بسيط
+    function frame(w,h){
+      // خلفية تدرّج عاجي
+      const g = ctx.createLinearGradient(0,0,0,h);
+      g.addColorStop(0,'#fffdf7');
+      g.addColorStop(1,'#f7f3ea');
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,w,h);
+
+      // حد ذهبي مزدوج
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#e6c35a';
+      ctx.strokeRect(30,30,w-60,h-60);
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#b7922e';
+      ctx.strokeRect(54,54,w-108,h-108);
+
+      // لمعة خفيفة
+      const g2 = ctx.createLinearGradient(0,0,w,0);
+      g2.addColorStop(0,'rgba(255,215,120,.18)');
+      g2.addColorStop(0.5,'rgba(255,255,255,0)');
+      g2.addColorStop(1,'rgba(255,215,120,.18)');
+      ctx.fillStyle = g2;
+      ctx.fillRect(54,54,w-108,120);
+    }
+
+    // أداة نص عربية وسطية
+    function drawText(txt, x, y, size, color, weight='700', family='"Noto Naskh Arabic","Tahoma","Arial",sans-serif'){
+      ctx.save();
+      ctx.fillStyle = color; ctx.textBaseline = 'middle';
+      ctx.font = `${weight} ${size}px ${family}`;
+      ctx.direction = 'rtl'; ctx.textAlign = 'center';
+      ctx.fillText(txt, x, y);
+      ctx.restore();
+    }
+
+    // عنوان انجليزي ثانوي
+    function drawLatin(txt, x, y, size, color, weight='800', family='system-ui,Segoe UI,Arial,sans-serif'){
+      ctx.save();
+      ctx.fillStyle = color; ctx.textBaseline = 'middle';
+      ctx.font = `${weight} ${size}px ${family}`;
+      ctx.textAlign = 'center';
+      ctx.fillText(txt, x, y);
+      ctx.restore();
+    }
+
+    // ختم RIZZO
+    function stamp(x,y,r){
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.rotate(-0.12);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = 'rgba(230, 155, 40, 0.85)';
+      ctx.fillStyle = 'rgba(255, 215, 120, 0.16)';
+      ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.stroke(); ctx.fill();
+      drawLatin('RIZZO',0,0,Math.floor(r*0.35),'#c68a16','900');
+      ctx.restore();
+    }
+
+    function renderCert(fullName){
+      done.textContent = ''; msg.textContent = '';
+
+      const W = 1600, H = 1131;
+      frame(W,H);
+
+      // شعار علوي
+      drawLatin('RIZZO — CERTIFICATE', W/2, 150, 34, '#a47b16','900');
+
+      // العنوان الرئيسي
+      drawText('شهادة «مدير الفضاوة»', W/2, 250, 54, '#3a2a09','900');
+
+      // المكرم/ـة الاسم
+      drawText('المكرم/ـة', W/2, 365, 30, '#6b5a2a','800');
+      drawText(fullName, W/2, 425, 48, '#0b0b0b','900');
+
+      // نص الاستحقاق
+      drawText('لحصوله/ـا على شهادة «مدير الفضاوة» نظير اجتياز تجربة الأكواد التفاعلية بنجاح.', W/2, 500, 28, '#1b1b1b','700');
+
+      // سطر الإشراف
+      drawText('تحت إشراف: المهندس المدرب المعضل سليمان — Rizzo', W/2, 570, 26, '#1b1b1b','800');
+
+      // التاريخ
+      const dt = new Date();
+      const dstr = dt.toLocaleDateString('ar-SA', {year:'numeric', month:'long', day:'numeric'});
+      drawText('التاريخ: ' + dstr, W/2, 620, 24, '#3b3b3b','700');
+
+      // تواقيع
+      drawText('توقيع المشرف', W/2 - 420, 760, 22, '#3b3b3b','700');
+      drawText('توقيع المتدرّب', W/2 + 420, 760, 22, '#3b3b3b','700');
+
+      ctx.strokeStyle = '#b2923a'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(W/2 - 560, 790); ctx.lineTo(W/2 - 280, 790); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W/2 + 280, 790); ctx.lineTo(W/2 + 560, 790); ctx.stroke();
+
+      // ختم
+      stamp(W-260, H-260, 120);
+    }
+
+    // توليد + تنزيل
+    function generate(){
+      const first = (document.getElementById('first').value || '').trim();
+      const second = (document.getElementById('second').value || '').trim();
+      if(!first || !second){
+        msg.textContent = 'رجاءً اكتب الاسم الأول والثاني.';
+        return;
+      }
+      const full = `${first} ${second}`;
+      renderCert(full);
+
+      // تجهيز رابط التحميل
+      const dataURL = cv.toDataURL('image/png');
+      dlLink.href = dataURL;
+      dlLink.classList.remove('dl');
+      done.textContent = '✅ تمت جاهزية الشهادة — اضغط "تحميل الشهادة PNG".';
+    }
+
+    genBtn.addEventListener('click', generate);
+
+    // توليد مثال افتراضي أول ما تُفتح الصفحة (للمعاينة)
+    renderCert('فلان الفلاني');
+  </script>
+</body>
+</html>
