@@ -7,144 +7,81 @@
   <style>
     /* صفحة كاملة سوداء */
     html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:monospace;}
-    /* حاوية للـmatrix */
-    .matrix {
-      position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;
-      background: radial-gradient(ellipse at center, rgba(0,0,0,0.15), transparent 40%), #000;
-    }
+    .matrix {position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;}
     canvas {display:block;width:100%;height:100%;}
-    /* منطقة الصورة المركزية */
-    .center {
-      position:relative;z-index:3;height:100%;display:flex;align-items:center;justify-content:center;
-      pointer-events:none;
-    }
+    .center {position:relative;z-index:3;height:100%;display:flex;align-items:center;justify-content:center;}
     .card {
       position:relative;width:340px;height:340px;border-radius:12px;overflow:hidden;
       display:flex;align-items:center;justify-content:center;
       box-shadow:0 20px 60px rgba(0,0,0,0.6), inset 0 0 120px rgba(0,255,40,0.03);
       background:rgba(0,0,0,0.45);backdrop-filter: blur(2px);
-      pointer-events:auto;
+    }
+    .card img{width:100%;height:100%;object-fit:cover;display:block;}
+
+    /* النص الهكري */
+    .hack-text {
+      position: absolute;
+      top: 15%; /* يخليه فوق الصورة */
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 26px;
+      font-family: monospace;
+      color: #0f0;
+      text-shadow: 0 0 8px #0f0, 0 0 14px #0f0;
+      animation: flicker 1.2s infinite alternate;
+      z-index: 5;
+    }
+    @keyframes flicker {
+      from { opacity: 1; }
+      to { opacity: 0.4; }
     }
 
-    .card img{
-      width:100%;height:100%;object-fit:cover;display:block;
-      transform-origin:center;
-      animation:float 4s ease-in-out infinite, glitch 3s infinite;
-    }
-
-    @keyframes float{
-      0%{transform:translateY(0px) scale(1);}
-      50%{transform:translateY(-6px) scale(1.01);}
-      100%{transform:translateY(0px) scale(1);}
-    }
-
-    /* تأثير تشويش/تقطع خفيف */
-    @keyframes glitch {
-      0%{filter: hue-rotate(0deg) contrast(1);}
-      10%{transform:translateX(-1px) skewX(-0.5deg);filter: hue-rotate(10deg) contrast(1.05);}
-      20%{transform:translateX(1px) skewX(0.4deg);filter:hue-rotate(-10deg) contrast(0.95);}
-      30%{transform:translateX(-2px) skewX(1deg);filter: hue-rotate(25deg) contrast(1.08);}
-      40%{transform:none;filter: none;}
-      100%{transform:none;filter:none;}
-    }
-
-    /* نص تحت الصورة */
+    /* نص أسفل الصورة */
     .label {
       position:absolute;bottom:-60px;left:50%;transform:translateX(-50%);z-index:4;
       color:#0f0;text-shadow:0 0 12px rgba(0,255,0,0.25);
       font-size:14px;padding:8px 14px;border-radius:6px;background:rgba(0,0,0,0.6);
       letter-spacing:1px;border:1px solid rgba(0,255,0,0.08);
-      pointer-events:none;
     }
-
-    /* خطوط وهمية متقطعة حول الصورة لإحساس الحركة */
-    .card:before, .card:after{
-      content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;
-      mix-blend-mode:screen;opacity:0.12;
-    }
-    .card:before{box-shadow:0 0 30px rgba(0,255,100,0.05) inset;}
-    .card:after{background:linear-gradient(90deg,transparent 0%, rgba(0,255,0,0.06) 50%, transparent 100%);animation:slide 3s linear infinite;}
-    @keyframes slide{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
-
-    /* responsive */
-    @media (max-width:420px){
-      .card{width:280px;height:280px}
-    }
-    .hack-text {
-  position: absolute;
-  top: 15%; /* يخليه فوق الصورة */
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 26px;
-  font-family: monospace;
-  color: #0f0;
-  text-shadow: 0 0 8px #0f0, 0 0 14px #0f0;
-  animation: flicker 1.2s infinite alternate;
-  z-index: 5;
-}
-
-@keyframes flicker {
-  from { opacity: 1; }
-  to { opacity: 0.4; }
-}
-
   </style>
 </head>
 <body>
-  <div class="matrix">
-    <canvas id="c"></canvas>
-  </div>
+  <div class="matrix"><canvas id="c"></canvas></div>
 
   <div class="center" aria-hidden="true">
     <div class="card">
-      <!-- غيّر اسم الصورة هنا لو رفعتها باسم ثاني -->
       <img src="prank-image.png" alt="prank image" />
     </div>
-    <div class="label">System breach detected — Rizzo mode</div>
     <div class="hack-text">Rizzo knows your weight...</div>
-
+    <div class="label">System breach detected — Rizzo mode</div>
   </div>
 
   <script>
-    /* Binary rain (matrix) canvas */
+    /* binary rain */
     const canvas = document.getElementById('c');
     const ctx = canvas.getContext('2d');
     let w = canvas.width = innerWidth;
     let h = canvas.height = innerHeight;
-
     const cols = Math.floor(w / 14);
     const yPos = Array(cols).fill(0);
 
-    function resize(){
-      w = canvas.width = innerWidth;
-      h = canvas.height = innerHeight;
-    }
+    function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight;}
     addEventListener('resize', resize);
 
     function draw(){
-      // translucent bg creates trail effect
       ctx.fillStyle = 'rgba(0,0,0,0.12)';
       ctx.fillRect(0,0,w,h);
       ctx.font = '14px monospace';
-
       for (let i=0;i<cols;i++){
         const x = i * 14;
-        const text = Math.random() > 0.5 ? '1' : '0';
-        const r = Math.random();
-        if (r < 0.02) ctx.fillStyle = 'rgba(180,255,180,0.95)'; // bright head
-        else ctx.fillStyle = 'rgba(0,180,0,' + (0.2 + Math.random()*0.6) + ')';
-        ctx.fillText(text, x, yPos[i] * 14);
-        if (yPos[i] * 14 > h && Math.random() > 0.975) yPos[i] = 0;
+        const text = Math.random()>0.5 ? '1':'0';
+        ctx.fillStyle = Math.random()<0.02 ? '#b4ffb4':'rgba(0,180,0,'+(0.2+Math.random()*0.6)+')';
+        ctx.fillText(text,x,yPos[i]*14);
+        if (yPos[i]*14>h && Math.random()>0.975) yPos[i]=0;
         yPos[i]++;
       }
       requestAnimationFrame(draw);
     }
-    // subtle flicker overlay to feel "hacky"
-    setInterval(()=> {
-      document.body.style.filter = 'contrast(' + (1 + (Math.random()*0.05)) + ')';
-    }, 200);
-
-    // start
     draw();
   </script>
 </body>
