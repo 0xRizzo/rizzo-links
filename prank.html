@@ -70,6 +70,24 @@
     @media (max-width:420px){
       .card{width:280px;height:280px}
     }
+    .hack-text {
+  position: absolute;
+  top: 15%; /* يخليه فوق الصورة */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 26px;
+  font-family: monospace;
+  color: #0f0;
+  text-shadow: 0 0 8px #0f0, 0 0 14px #0f0;
+  animation: flicker 1.2s infinite alternate;
+  z-index: 5;
+}
+
+@keyframes flicker {
+  from { opacity: 1; }
+  to { opacity: 0.4; }
+}
+
   </style>
 </head>
 <body>
@@ -83,6 +101,8 @@
       <img src="prank-image.png" alt="prank image" />
     </div>
     <div class="label">System breach detected — Rizzo mode</div>
+    <div class="hack-text">Rizzo knows your weight...</div>
+
   </div>
 
   <script>
