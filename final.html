@@ -39,7 +39,7 @@
     .dl{display:none}
     .ok{color:#8ef6a0; font-size:13px}
     #confetti {position:fixed; inset:0; pointer-events:none; z-index:3; display:none;}
-    .grid-tokens{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+    .grid-tokens{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
     @media (max-width:640px){.grid-tokens{grid-template-columns:1fr}}
   </style>
 </head>
@@ -50,7 +50,7 @@
   <div class="wrap">
     <div class="card">
       <h1>بوابة «مدير الفضاوة»</h1>
-      <p class="sub">اكتب اسمك + أدخل **أكواد المرور** من الصفحات السابقة (Snap/Instа/YouTube/Prank/China/Slim). إذا كلها صحيحة، تنفتح لك الشهادة للتحميل.</p>
+      <p class="sub">أدخل اسمك + **رمزي التحقق** من صفحتي China و Slim فقط. إذا الرمزين صحّ، تفتح لك الشهادة للتحميل. هذا يضمن إن اللي يحصل الشهادة فعلاً تفاعل مع الصفحات المطلوبة.</p>
 
       <form id="f">
         <div class="field">
@@ -61,15 +61,12 @@
           <label>الاسم الثاني</label>
           <input id="second" placeholder="مثال: العتيبي" required />
         </div>
+
         <div class="field" style="grid-column:1/-1">
-          <label>أكواد المرور (زي ما ظهرت على كل صفحة)</label>
+          <label>رمز China (انسخه من صفحة China)</label>
           <div class="grid-tokens">
-            <input id="t1" placeholder="Snap token" />
-            <input id="t2" placeholder="Insta token" />
-            <input id="t3" placeholder="YouTube token" />
-            <input id="t4" placeholder="Prank token" />
-            <input id="t5" placeholder="China token" />
-            <input id="t6" placeholder="Slim token" />
+            <input id="t_china" placeholder="Token from China page" />
+            <input id="t_slim" placeholder="Token from Slim page" />
           </div>
         </div>
       </form>
@@ -93,16 +90,11 @@
   <img id="qrImg" src="qr-yt.png" alt="QR YouTube" style="display:none" />
 
   <script>
-    /* ===== الإعدادات العامة ===== */
+    /* ===== الإعداد: رموز التحقق المتوقعة (غيرها هنا لو حبيت لاحقاً) ===== */
     const EXPECTED = {
-      snap: 'RZ-SNAP-9F',
-      insta:'RZ-INST-2K',
-      yt:   'RZ-YT-7Q',
-      prank:'RZ-PRK-5M',
       china:'RZ-CHN-8X',
       slim: 'RZ-SLM-3Z'
     };
-    // لو تبغى تغيّر الأكواد لاحقاً، بس عدّل EXPECTED وفقط.
 
     const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     const cv = document.getElementById('cv');
@@ -123,7 +115,7 @@
     }
     scaleCanvas();
 
-    /* ===== رسم الشهادة ===== */
+    /* ===== وظائف الرسم ===== */
     function frame(w,h){
       const g = ctx.createLinearGradient(0,0,0,h);
       g.addColorStop(0,'#fffdf7'); g.addColorStop(1,'#f7f3ea');
@@ -171,7 +163,7 @@
       ctx.beginPath(); ctx.moveTo(W/2 + 280, 790); ctx.lineTo(W/2 + 560, 790); ctx.stroke();
       stamp(W-260, H-260, 120);
 
-      // QR اختياري
+      // QR اختياري أسفل يمين
       const qr = document.getElementById('qrImg');
       const qrSize = 180, qrX = W - 54 - qrSize, qrY = H - 54 - qrSize;
       ctx.fillStyle='rgba(0,0,0,0.04)'; ctx.fillRect(qrX-10, qrY-32, qrSize+20, qrSize+42);
@@ -180,25 +172,20 @@
       else { qr.onload = ()=>{ try{ctx.drawImage(qr, qrX, qrY, qrSize, qrSize);}catch(e){} }; }
     }
 
-    /* ===== تحقق الأكواد ثم فتح التوليد ===== */
+    /* ===== تحقق الرمزين ثم فتح التوليد ===== */
     function clean(s){return (s||'').trim().toUpperCase();}
     function verifyTokens(){
-      const f = clean(document.getElementById('first').value);
-      const s = clean(document.getElementById('second').value);
-      const t1 = clean(document.getElementById('t1').value);
-      const t2 = clean(document.getElementById('t2').value);
-      const t3 = clean(document.getElementById('t3').value);
-      const t4 = clean(document.getElementById('t4').value);
-      const t5 = clean(document.getElementById('t5').value);
-      const t6 = clean(document.getElementById('t6').value);
+      const f = (document.getElementById('first').value||'').trim();
+      const s = (document.getElementById('second').value||'').trim();
+      const tChina = clean(document.getElementById('t_china').value);
+      const tSlim  = clean(document.getElementById('t_slim').value);
 
       if(!f || !s){ msg.textContent='اكتب الاسم الأول والثاني أولاً.'; return; }
 
-      const ok = (t1===EXPECTED.snap && t2===EXPECTED.insta && t3===EXPECTED.yt &&
-                  t4===EXPECTED.prank && t5===EXPECTED.china && t6===EXPECTED.slim);
+      const ok = (tChina === EXPECTED.china && tSlim === EXPECTED.slim);
 
       if(!ok){
-        msg.textContent = 'أكواد المرور غير صحيحة أو ناقصة. زر كل الأكواد مرة ثانية وانسخ الرموز كما هي.';
+        msg.textContent = 'رموز التحقق غير صحيحة أو ناقصة. تأكّد إنك نسخت الرمزين من صفحات China و Slim بالضبط.';
         return;
       }
 
@@ -208,7 +195,7 @@
       dlLink.href = dataURL;
       dlLink.classList.remove('dl');
       done.textContent = '✅ تم التحقق — الشهادة جاهزة. اضغط "تحميل الشهادة PNG".';
-      launchConfetti(4000);
+      launchConfetti(3500);
     }
 
     document.getElementById('verify').addEventListener('click', verifyTokens);
