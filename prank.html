@@ -1,37 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Prank</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rizzo — Prank</title>
   <style>
-    body{margin:0;background:#000;color:#0f0;overflow:hidden;height:100vh}
-    .matrix{position:absolute;top:0;left:0;width:100%;height:100%;font:16px monospace;line-height:16px;color:#0f0;opacity:.75;white-space:pre}
-    .card-wrap{position:relative;display:inline-block;top:20%;left:50%;transform:translateX(-50%)}
-    .hack-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;
-      font-size:clamp(16px,6vw,32px);font-family:monospace;color:#0f0;
-      text-shadow:0 0 8px #0f0,0 0 14px #0f0;animation:flicker 1.2s infinite alternate}
-    @keyframes flicker{from{opacity:1}to{opacity:.4}}
-    .card img{max-width:400px;width:90%;border:3px solid #0f0;border-radius:12px}
+    html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:monospace;}
+    .matrix {position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;}
+    canvas {display:block;width:100%;height:100%;}
+
+    .center {position:relative;z-index:3;height:100%;display:flex;align-items:center;justify-content:center;}
+    .card-wrap {position: relative; display: inline-block;}
+
+    .card {
+      position:relative;width:340px;height:340px;border-radius:12px;overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6), inset 0 0 120px rgba(0,255,40,0.03);
+      background:rgba(0,0,0,0.45);backdrop-filter: blur(2px);
+    }
+    .card img{width:100%;height:100%;object-fit:cover;display:block;}
+
+    /* النص فوق الصورة */
+    .hack-text {
+      position: absolute;
+      bottom: calc(100% + 8px);  /* فوق الصورة مباشرة */
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;        /* يمنع النزول لسطر جديد */
+      font-size: clamp(16px, 6vw, 32px);
+      font-family: monospace;
+      color: #0f0;
+      text-shadow: 0 0 8px #0f0, 0 0 14px #0f0;
+      animation: flicker 1.2s infinite alternate;
+      z-index: 5;
+    }
+    @keyframes flicker {
+      from { opacity: 1; }
+      to { opacity: 0.4; }
+    }
+
+    .label {
+      position:absolute;bottom:-60px;left:50%;transform:translateX(-50%);z-index:4;
+      color:#0f0;text-shadow:0 0 12px rgba(0,255,0,0.25);
+      font-size:14px;padding:8px 14px;border-radius:6px;background:rgba(0,0,0,0.6);
+      letter-spacing:1px;border:1px solid rgba(0,255,0,0.08);
+    }
   </style>
 </head>
 <body>
-  <div class="matrix" id="matrix"></div>
-  <div class="card-wrap">
-    <div class="hack-text">Rizzo knows your weight...</div>
-    <div class="card">
-      <img src="prank-image.png" alt="prank image" />
+  <div class="matrix"><canvas id="c"></canvas></div>
+
+  <div class="center" aria-hidden="true">
+    <div class="card-wrap">
+      <div class="hack-text">Rizzo knows your weight...</div>
+      <div class="card">
+        <img src="prank-image.png" alt="prank image" />
+      </div>
     </div>
+    <div class="label">System breach detected — Rizzo mode</div>
   </div>
 
-  <style>.rz-badge{...}</style>
-  <div class="rz-badge">Token: RZ-PRK-5M</div>
-
   <script>
-    const el=document.getElementById("matrix");const cols=Math.floor(window.innerWidth/16);const drops=Array(cols).fill(1);
-    function draw(){let out="";for(let i=0;i<drops.length;i++){out+=Math.random()>0.975?"\n":"01"[Math.floor(Math.random()*2)];
-    if(Math.random()>0.975)drops[i]=0;drops[i]++}el.textContent+=out+"\n"}
-    setInterval(draw,50);
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = innerWidth;
+    let h = canvas.height = innerHeight;
+    const cols = Math.floor(w / 14);
+    const yPos = Array(cols).fill(0);
+
+    function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight;}
+    addEventListener('resize', resize);
+
+    function draw(){
+      ctx.fillStyle = 'rgba(0,0,0,0.12)';
+      ctx.fillRect(0,0,w,h);
+      ctx.font = '14px monospace';
+      for (let i=0;i<cols;i++){
+        const x = i * 14;
+        const text = Math.random()>0.5 ? '1':'0';
+        ctx.fillStyle = Math.random()<0.02 ? '#b4ffb4':'rgba(0,180,0,'+(0.2+Math.random()*0.6)+')';
+        ctx.fillText(text,x,yPos[i]*14);
+        if (yPos[i]*14>h && Math.random()>0.975) yPos[i]=0;
+        yPos[i]++;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
   </script>
 </body>
 </html>
