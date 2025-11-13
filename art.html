@@ -77,34 +77,8 @@
       gap: 12px;
       justify-content: center;
     }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.35);
-      font-size: 11px;
-      color: var(--text-muted);
-      background: rgba(15,23,42,0.85);
-    }
-    .steps {
-      margin: 0;
-      padding-left: 18px;
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-    .steps li { margin-bottom: 4px; }
-    .highlight {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 8px;
-      background: rgba(15,118,110,0.18);
-      font-size: 12px;
-      color: #6ee7b7;
-    }
     .cta-box {
-      margin-top: 10px;
+      margin-top: 6px;
       padding: 10px 12px;
       border-radius: 14px;
       background: rgba(15,23,42,0.95);
@@ -113,7 +87,31 @@
     }
     .cta-box strong { color: var(--accent); }
 
-    /* يمين: عرض الصورة */
+    .secret {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
+    }
+    .secret-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .secret-value {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(34,211,238,0.36);
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
     .right {
       position: relative;
       display: flex;
@@ -134,18 +132,6 @@
         0 18px 60px rgba(0,0,0,0.9),
         0 0 0 1px rgba(15,23,42,0.9);
       overflow: hidden;
-    }
-    .qr-frame::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background:
-        linear-gradient(135deg, rgba(56,189,248,0.3), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(244,63,94,0.36), transparent 52%);
-      mix-blend-mode: screen;
-      opacity: 0.35;
-      pointer-events: none;
     }
     .qr-inner {
       position: relative;
@@ -188,63 +174,54 @@
       color: var(--accent);
       font-weight: 600;
     }
-    a.link {
-      color: var(--accent);
-      text-decoration: none;
-    }
   </style>
 </head>
 <body>
   <div class="wrap">
+
     <div class="badge">
       <span>🧬</span>
       <span>Hidden QR Art • Easter Egg</span>
     </div>
+
     <h1>وصلت للكود الشكّال 🎨</h1>
     <p class="sub">
-      الكود اللي مسحته قبل شوي مو QR عادي… هو صورة كاملة، ومع ذلك جوالك قدر يقرأه 👀.
+      إذا وصلت لهنا… فأنت من الناس اللي يستحقون التقدير. 👑  
     </p>
 
     <div class="card">
       <div class="left">
-        <span class="pill">كيف قدر يشتغل وهو متغطي بصورة؟</span>
-        <p style="margin:4px 0 8px;font-size:14px;">
-          الفكرة بسيطة لكن ذكيّة:
-        </p>
-        <ol class="steps">
-          <li>نولّد QR عادي لكن بمستوى <span class="highlight">تصحيح خطأ عالي (Error Correction H)</span>؛
-              هذا يسمح لنا نخربش على جزء من الكود بدون ما يموت.</li>
-          <li>نكبر الكود ونخلي أهم المناطق (المربعات الكبيرة في الزوايا) واضحة وواضحة التباين.</li>
-          <li>نركّب فوقه صورة أو شخصية، بس نحرص إن تفاصيل الصورة ما تغطي كل البكسلات المهمة.</li>
-          <li>نختبره على أكثر من جوال وبرنامج مسح… لو اشتغل مع الأغلب، نعتمده.</li>
-        </ol>
 
         <div class="cta-box">
-          <strong>أنت الحين جزء من التجربة 🤝</strong><br/>
-          أي QR تشوفه على شكل صورة في محتوى <span>Rizzo</span>:
-          جرّب تمسحه… يمكن يطلع لك صفحة مخفيّة، جائزة، أو رسالة خاصة.
+          <p style="margin:0 0 6px;font-size:14px;">
+            أنت الحين جزء من التجربة 🤝  
+            أي QR تشوفه على شكل صورة في محتوى Rizzo:  
+            جرّب تمسحه… يمكن يطلع لك صفحة مخفيّة، جائزة، أو رسالة خاصة.
+          </p>
+
+          <div class="secret">
+            <span class="secret-label">Hidden QR Code</span>
+            <span class="secret-value">RZ-QRART-9203</span>
+          </div>
         </div>
 
-        <p style="margin:6px 0 0;font-size:13px;color:var(--text-muted);">
-          لو حاب تتعمّق أكثر في عالم الـ QR وكيف يتحمّل التخبيص والتشويه، راح أشرحها بالتفصيل في
-          <a class="link" href="https://www.youtube.com/@0xrizzo" target="_blank" rel="noopener">قناة Rizzo على يوتيوب</a>.
-        </p>
       </div>
 
       <div class="right">
         <div class="qr-frame">
           <div class="qr-inner">
-            <!-- هنا تحط صورة الـ QR الجمالي اللي سويته -->
-            <img src="pretty-qr-example.png" alt="QR Art Example by Rizzo" />
+            <!-- ضع هنا صورة الـ QR الفنية -->
+            <img src="qr-city-art.png" alt="Rizzo QR City Art" />
           </div>
-          <div class="qr-note">هذه صورة كاملة، لكنها QR حقيقي في نفس الوقت.</div>
+          <div class="qr-note">لوحة… لكنها كود فعلي يشتغل.</div>
         </div>
       </div>
     </div>
 
     <div class="footer">
-      اكتشفت واحد من الأكواد المخفية لـ <span>Rizzo</span> — خذ سكرين وارسلها لو حاب تتفاخر 😎
+      اكتشفت واحد من الأكواد المخفية لـ <span>Rizzo</span> — احتفظ فيه 😉
     </div>
+
   </div>
 </body>
 </html>
