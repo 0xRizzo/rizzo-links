@@ -68,15 +68,15 @@
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
       gap: 16px;
     }
-    @media (max-width: 900px) {
-      .card { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px) { .card { grid-template-columns: 1fr; } }
+
     .left {
       display: flex;
       flex-direction: column;
       gap: 12px;
       justify-content: center;
     }
+
     .cta-box {
       margin-top: 6px;
       padding: 10px 12px;
@@ -118,6 +118,7 @@
       align-items: center;
       justify-content: center;
     }
+
     .qr-frame {
       position: relative;
       width: min(320px, 80vw);
@@ -133,6 +134,7 @@
         0 0 0 1px rgba(15,23,42,0.9);
       overflow: hidden;
     }
+
     .qr-inner {
       position: relative;
       width: 100%;
@@ -143,6 +145,7 @@
       place-items: center;
       overflow: hidden;
     }
+
     .qr-inner img {
       width: 101%;
       height: 101%;
@@ -150,6 +153,7 @@
       image-rendering: pixelated;
       filter: contrast(1.05) saturate(1.05);
     }
+
     .qr-note {
       position: absolute;
       bottom: 8px;
@@ -170,13 +174,11 @@
       text-align: center;
       color: var(--text-muted);
     }
-    .footer span {
-      color: var(--accent);
-      font-weight: 600;
-    }
+    .footer span { color: var(--accent); font-weight: 600; }
   </style>
 </head>
 <body>
+
   <div class="wrap">
 
     <div class="badge">
@@ -185,13 +187,11 @@
     </div>
 
     <h1>وصلت للكود الشكّال 🎨</h1>
-    <p class="sub">
-      إذا وصلت لهنا… فأنت من الناس اللي يستحقون التقدير. 👑  
-    </p>
+    <p class="sub">إذا وصلت لهنا… فأنت من الناس اللي يستحقون التقدير. 👑</p>
 
     <div class="card">
-      <div class="left">
 
+      <div class="left">
         <div class="cta-box">
           <p style="margin:0 0 6px;font-size:14px;">
             أنت الحين جزء من التجربة 🤝  
@@ -204,18 +204,18 @@
             <span class="secret-value">RZ-QRART-9203</span>
           </div>
         </div>
-
       </div>
 
       <div class="right">
         <div class="qr-frame">
           <div class="qr-inner">
-            <!-- ضع هنا صورة الـ QR الفنية -->
-            <img src="qr-city-art.png" alt="Rizzo QR City Art" />
+            <!-- الصورة الخاصة بالـ QR (ارفع art-image.png في نفس المجلد) -->
+            <img src="art-image.png" alt="Rizzo QR Art" />
           </div>
           <div class="qr-note">لوحة… لكنها كود فعلي يشتغل.</div>
         </div>
       </div>
+
     </div>
 
     <div class="footer">
@@ -223,5 +223,6 @@
     </div>
 
   </div>
+
 </body>
 </html>
