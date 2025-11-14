@@ -8,39 +8,120 @@
     :root{
       --bg:#0b0b0f; --panel:#121217; --ink:#eaeaea; --accent:#ffd166; --accent2:#ffcc33; --muted:#9aa0a6;
     }
-    html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Noto Naskh Arabic","Tahoma","Arial",sans-serif}
-    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
-    .card{
-      width:min(980px,96vw); background:linear-gradient(180deg, rgba(255,209,102,0.06), transparent 18%), var(--panel);
-      border:1px solid #1f2230; border-radius:18px; padding:22px 18px; box-shadow:0 20px 60px rgba(0,0,0,.45), inset 0 0 120px rgba(255,209,102,.04);
-      position:relative; z-index:2;
+    html,body{
+      margin:0;
+      height:100%;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:system-ui,-apple-system,"Segoe UI","Noto Naskh Arabic","Tahoma","Arial",sans-serif
     }
-    h1{margin:4px 0 14px; font-weight:800; letter-spacing:.3px; text-align:center; font-size:clamp(20px,5.6vw,34px)}
-    .sub{margin:0 0 18px; color:var(--muted); text-align:center; font-size:clamp(13px,3.4vw,16px)}
-    form{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:8px 0 16px}
-    @media (max-width:640px){form{grid-template-columns:1fr}}
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      position:relative
+    }
+    @media (max-width:640px){
+      .wrap{
+        align-items:flex-start;
+        padding-top:16px;
+        padding-bottom:24px;
+      }
+    }
+    .card{
+      width:min(980px,96vw);
+      background:linear-gradient(180deg, rgba(255,209,102,0.06), transparent 18%), var(--panel);
+      border:1px solid #1f2230;
+      border-radius:18px;
+      padding:22px 18px;
+      box-shadow:0 20px 60px rgba(0,0,0,.45), inset 0 0 120px rgba(255,209,102,.04);
+      position:relative;
+      z-index:2;
+    }
+    h1{
+      margin:4px 0 14px;
+      font-weight:800;
+      letter-spacing:.3px;
+      text-align:center;
+      font-size:clamp(20px,5.6vw,34px)
+    }
+    .sub{
+      margin:0 0 18px;
+      color:var(--muted);
+      text-align:center;
+      font-size:clamp(13px,3.4vw,16px)
+    }
+    form{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin:8px 0 16px
+    }
+    @media (max-width:640px){
+      form{grid-template-columns:1fr}
+    }
     .field{display:flex; flex-direction:column; gap:6px}
     label{font-size:14px; color:#c7cad1}
     input{
-      background:#0f1118; color:#eaecef; border:1px solid #2a2f3f; border-radius:10px; padding:12px 12px;
-      outline:none; font-size:16px;
+      background:#0f1118;
+      color:#eaecef;
+      border:1px solid #2a2f3f;
+      border-radius:10px;
+      padding:12px 12px;
+      outline:none;
+      font-size:16px;
     }
     input:focus{border-color:var(--accent)}
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; margin-top:6px}
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+      margin-top:6px
+    }
     button{
-      appearance:none; border:0; cursor:pointer; color:#101214; font-weight:800; letter-spacing:.2px;
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      color:#101214;
+      font-weight:800;
+      letter-spacing:.2px;
       background:linear-gradient(180deg,var(--accent),var(--accent2));
-      padding:12px 16px; border-radius:12px; min-width:180px; box-shadow:0 8px 26px rgba(255,209,102,.25);
+      padding:12px 16px;
+      border-radius:12px;
+      min-width:180px;
+      box-shadow:0 8px 26px rgba(255,209,102,.25);
     }
     button:active{transform:translateY(1px)}
     .hint{color:#a9b0bb; font-size:13px; text-align:center; margin-top:4px}
-    .canvasWrap{margin-top:18px; display:flex; flex-direction:column; align-items:center; gap:10px}
-    canvas{width:min(100%,980px); height:auto; border-radius:14px; background:#fff; box-shadow:0 18px 40px rgba(0,0,0,.35)}
+    .canvasWrap{
+      margin-top:18px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px
+    }
+    canvas{
+      width:min(100%,980px);
+      height:auto;
+      border-radius:14px;
+      background:#fff;
+      box-shadow:0 18px 40px rgba(0,0,0,.35)
+    }
     .dl{display:none}
     .ok{color:#8ef6a0; font-size:13px}
     #confetti {position:fixed; inset:0; pointer-events:none; z-index:3; display:none;}
-    .grid-tokens{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
-    @media (max-width:640px){.grid-tokens{grid-template-columns:1fr}}
+    .grid-tokens{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px
+    }
+    @media (max-width:640px){
+      .grid-tokens{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
@@ -50,23 +131,27 @@
   <div class="wrap">
     <div class="card">
       <h1>بوابة «مدير الفضاوة»</h1>
-      <p class="sub">أدخل اسمك + **رمزي التحقق** من صفحتي China و Slim فقط. إذا الرمزين صحّ، تفتح لك الشهادة للتحميل. هذا يضمن إن اللي يحصل الشهادة فعلاً تفاعل مع الصفحات المطلوبة.</p>
+      <p class="sub">
+        أدخل اسمك + رموز التحقق من صفحات China و Slim و QR Art.  
+        إذا كل الرموز صحيحة، تفتح لك الشهادة للتحميل — وهذا يضمن إن اللي يحصل الشهادة فعلاً تعب وتفاعل.
+      </p>
 
       <form id="f">
         <div class="field">
           <label>الاسم الأول</label>
-          <input id="first" placeholder="مثال: محمد" required />
+          <input id="first" placeholder="مثال: سليمان" required />
         </div>
         <div class="field">
           <label>الاسم الثاني</label>
-          <input id="second" placeholder="مثال: العتيبي" required />
+          <input id="second" placeholder="مثال: الحصان" required />
         </div>
 
         <div class="field" style="grid-column:1/-1">
-          <label>رمز China (انسخه من صفحة China)</label>
+          <label>رموز التحقق (انسخها من الصفحات الثلاث)</label>
           <div class="grid-tokens">
             <input id="t_china" placeholder="Token from China page" />
-            <input id="t_slim" placeholder="Token from Slim page" />
+            <input id="t_slim"  placeholder="Token from Slim page" />
+            <input id="t_art"   placeholder="Token from QR Art page" />
           </div>
         </div>
       </form>
@@ -90,10 +175,11 @@
   <img id="qrImg" src="qr-yt.png" alt="QR YouTube" style="display:none" />
 
   <script>
-    /* ===== الإعداد: رموز التحقق المتوقعة (غيرها هنا لو حبيت لاحقاً) ===== */
+    /* ===== الإعداد: رموز التحقق المتوقعة ===== */
     const EXPECTED = {
       china:'RZ-CHN-8X',
-      slim: 'RZ-SLM-3Z'
+      slim: 'RZ-SLM-3Z',
+      art:  'RZ-QRART-9203'
     };
 
     const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -172,24 +258,31 @@
       else { qr.onload = ()=>{ try{ctx.drawImage(qr, qrX, qrY, qrSize, qrSize);}catch(e){} }; }
     }
 
-    /* ===== تحقق الرمزين ثم فتح التوليد ===== */
     function clean(s){return (s||'').trim().toUpperCase();}
+
     function verifyTokens(){
       const f = (document.getElementById('first').value||'').trim();
       const s = (document.getElementById('second').value||'').trim();
       const tChina = clean(document.getElementById('t_china').value);
       const tSlim  = clean(document.getElementById('t_slim').value);
+      const tArt   = clean(document.getElementById('t_art').value);
 
-      if(!f || !s){ msg.textContent='اكتب الاسم الأول والثاني أولاً.'; return; }
-
-      const ok = (tChina === EXPECTED.china && tSlim === EXPECTED.slim);
-
-      if(!ok){
-        msg.textContent = 'رموز التحقق غير صحيحة أو ناقصة. تأكّد إنك نسخت الرمزين من صفحات China و Slim بالضبط.';
+      if(!f || !s){
+        msg.textContent='اكتب الاسم الأول والثاني أولاً.';
         return;
       }
 
-      // إذا صح → ارسم الشهادة وجهّز التحميل + كونفيتي
+      const ok = (
+        tChina === EXPECTED.china &&
+        tSlim  === EXPECTED.slim  &&
+        tArt   === EXPECTED.art
+      );
+
+      if(!ok){
+        msg.textContent = 'رموز التحقق غير صحيحة أو ناقصة. تأكّد إنك نسخت الرموز من صفحات China و Slim و QR Art بالضبط.';
+        return;
+      }
+
       renderCert(f + ' ' + s);
       const dataURL = cv.toDataURL('image/png');
       dlLink.href = dataURL;
@@ -198,8 +291,10 @@
       launchConfetti(3500);
     }
 
-    document.getElementById('verify').addEventListener('click', verifyTokens);
-    renderCert('فلان الفلاني'); // معاينة أولية
+    verifyBtn.addEventListener('click', verifyTokens);
+
+    // معاينة أولية باسمك
+    renderCert('سليمان الحصان');
 
     /* ===== كونفيتي ===== */
     const confetti = document.getElementById('confetti');
